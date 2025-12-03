@@ -29,7 +29,23 @@ pipeline {
                 }
             }
         }
+// ... stage('Calculate Version') 이후에 아래 단계를 추가합니다.
 
+        stage('Sonar Scan') {
+            steps {
+                // Jenkins UI에서 설정한 'SonarQube-Server'와 토큰을 가져와서 환경 설정
+                withSonarQubeEnv('SonarQube-Server') { 
+                    sh 'sonar-scanner \
+                        -Dsonar.projectKey=my-website-key \
+                        -Dsonar.projectName="My Web Site CI" \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://sonarqube:9000' // 내부 서비스 주소 사용
+                }
+                echo "✅ SonarQube 코드 분석 완료"
+            }
+        }
+        
+// ... stage('Build & Push')로 넘어갑니다.
         stage('Build & Push') {
             steps {
                 script {
