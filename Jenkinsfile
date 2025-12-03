@@ -16,14 +16,13 @@ pipeline {
         stage('Calculate Version') {
             steps {
                 script {
-                    // 1. 현재 빌드 번호 가져오기 (예: 1, 2, 10...)
+                    // 1. 현재 빌드 번호 가져오기
                     def buildNum = currentBuild.number.toInteger()
                     
-                    // 2. 0.1을 곱해서 버전 계산 (예: 1 -> 0.1, 12 -> 1.2)
-                    // String.format을 써서 소수점 첫째 자리까지 깔끔하게 자름
+                    // 2. 0.1을 곱해서 버전 계산 (예: 1 -> v0.1)
                     def verCalc = String.format("%.1f", buildNum * 0.1)
                     
-                    // 3. 환경 변수에 저장 (v0.1, v0.2 형식)
+                    // 3. 환경 변수에 저장
                     env.IMAGE_TAG = "v${verCalc}"
                     
                     echo "🎉 이번 빌드 버전은 [ ${env.IMAGE_TAG} ] 입니다."
@@ -34,13 +33,12 @@ pipeline {
         stage('Build & Push') {
             steps {
                 script {
-                    // 전체 이미지 주소 조합
                     def fullImageName = "${REGISTRY}/${PROJECT}/${IMAGE_NAME}:${env.IMAGE_TAG}"
 
-                    // 1. 도커 이미지 빌드
+                    // [수정됨] ./source -> . (점 하나)
+                    // 이유: 깃허브 최상위 경로에 Dockerfile이 있기 때문
                     sh "docker build -t ${fullImageName} ."
 
-                    // 2. 하버 로그인 및 푸쉬
                     withCredentials([usernamePassword(credentialsId: CREDENTIAL_ID, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                         sh "docker login ${REGISTRY} -u $USER -p $PASS"
                         sh "docker push ${fullImageName}"
@@ -54,7 +52,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // 배포 시에도 방금 만든 태그를 사용
                     def fullImageName = "${REGISTRY}/${PROJECT}/${IMAGE_NAME}:${env.IMAGE_TAG}"
 
                     // 기존 컨테이너 삭제 후 재실행
