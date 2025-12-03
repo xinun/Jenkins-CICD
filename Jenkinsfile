@@ -39,7 +39,7 @@ pipeline {
                     // 이유: 깃허브 최상위 경로에 Dockerfile이 있기 때문
                     sh "docker build -t ${fullImageName} ."
 
-                    withCredentials([usernamePassword(credentialsId: CREDENTIAL_ID, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: CREDENTIAL_ID, usernameVariable: 'admin', passwordVariable: 'Gkqj123!')]) {
                         sh "docker login ${REGISTRY} -u $USER -p $PASS"
                         sh "docker push ${fullImageName}"
                     }
