@@ -38,7 +38,7 @@ pipeline {
                     def fullImageName = "${REGISTRY}/${PROJECT}/${IMAGE_NAME}:${env.IMAGE_TAG}"
 
                     // 1. 도커 이미지 빌드
-                    sh "docker build -t ${fullImageName} ./source"
+                    sh "docker build -t ${fullImageName} ."
 
                     // 2. 하버 로그인 및 푸쉬
                     withCredentials([usernamePassword(credentialsId: CREDENTIAL_ID, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
